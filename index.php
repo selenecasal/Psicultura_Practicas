@@ -20,7 +20,7 @@
             <a href="#inicio" class="nav-link active">Inicio</a>
             <a href="#especies" class="nav-link">Especies</a>
             <a href="#proyectos" class="nav-link">Proyectos</a>
-            <a href="#capacitacion" class="nav-link">Capacitación</a>
+            <a href="#capacitacion" class="nav-link"></a>
             <a href="#contacto" class="nav-link">Contacto</a>
         </div>
     </nav>
