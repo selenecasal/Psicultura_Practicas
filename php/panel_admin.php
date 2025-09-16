@@ -1,3 +1,6 @@
+<?php
+include('conexion.php');
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -366,7 +369,7 @@
             }
         }
     </style>
-    <!-- Font Awesome for icons -->
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
@@ -374,7 +377,7 @@
         <div class="sidebar-header">Psicultura Admin</div>
         <a href="#" class="nav-link active" data-tab="dashboard">
             <i class="fas fa-tachometer-alt"></i>
-            <span>Dashboard</span>
+            <span>Inicio</span>
         </a>
         <a href="#" class="nav-link" data-tab="noticias">
             <i class="fas fa-newspaper"></i>
@@ -397,7 +400,7 @@
     </div>
 
     <div class="main-content">
-        <!-- Dashboard Tab -->
+       
         <div id="dashboard" class="tab-content active">
             <div class="header">
                 <h1>Resumen General</h1>
@@ -421,43 +424,45 @@
                             <th>Acciones</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td>María González</td>
-                            <td>maria@gmail.com</td>
-                            <td>Cultivo de rosas</td>
-                            <td>15/06/2023</td>
-                            <td><span class="status unread">No leída</span></td>
-                            <td>
-                                <button class="btn btn-outline btn-sm">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Carlos Martínez</td>
-                            <td>carlos@hotmail.com</td>
-                            <td>Podas</td>
-                            <td>14/06/2023</td>
-                            <td><span class="status read">Leída</span></td>
-                            <td>
-                                <button class="btn btn-outline btn-sm">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Laura Sánchez</td>
-                            <td>laura@gmail.com</td>
-                            <td>Control de plagas</td>
-                            <td>13/06/2023</td>
-                            <td><span class="status read">Leída</span></td>
-                            <td>
-                                <button class="btn btn-outline btn-sm">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </td>
-                        </tr>
+                    <tbody id="consultas-body">
+                    <?php
+                    $sql = "SELECT * FROM mensaje ORDER BY fecha_creacion DESC";
+                    $result = mysqli_query($conexion, $sql);
+
+                    if ($result && mysqli_num_rows($result) > 0) {
+                        while ($row = mysqli_fetch_assoc($result)) {
+                            // Formatear fecha a dd/mm/yyyy
+                            $fecha = date('d/m/Y', strtotime($row['fecha_creacion']));
+
+                            // Estado leído o no leído
+                            $statusClass = ($row['leido']) ? 'read' : 'unread';
+                            $statusText = ($row['leido']) ? 'Leída' : 'No leída';
+
+                            // Escapar datos para evitar XSS
+                            $id = (int)$row['id'];
+                            $nombre = htmlspecialchars($row['nombre']);
+                            $email = htmlspecialchars($row['email']);
+                            $telefono = htmlspecialchars($row['telefono']);
+                            $interes = htmlspecialchars($row['interes']);
+
+                            echo "<tr>
+                                    <td>{$nombre}</td>
+                                    <td>{$email}</td>
+                                    <td>{$telefono}</td>
+                                    <td>{$interes}</td>
+                                    <td>{$fecha}</td>
+                                    <td><span class='status {$statusClass}'>{$statusText}</span></td>
+                                    <td>
+                                        <button class='btn btn-outline btn-sm' onclick='verConsulta({$id})'>
+                                            <i class='fas fa-eye'></i> Ver
+                                        </button>
+                                    </td>
+                                </tr>";
+                        }
+                    } else {
+                        echo "<tr><td colspan='7'>No hay consultas para mostrar.</td></tr>";
+                    }
+                    ?>
                     </tbody>
                 </table>
             </div>
@@ -471,20 +476,20 @@
                 </div>
                 
                 <div class="noticia-card">
-                    <div class="noticia-title">Nuevas Técnicas de Cultivo</div>
-                    <div class="noticia-date">Publicado el 12/06/2023</div>
-                    <img src="https://images.unsplash.com/photo-1549345803-5f106209dddb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80" class="noticia-image">
-                    <div class="noticia-content">
-                        <p>Hemos implementado nuevas técnicas de cultivo que aumentan el rendimiento en un 20%. Estas técnicas se basan en...</p>
-                    </div>
-                    <div style="margin-top: 15px;">
-                        <button class="btn btn-outline btn-sm">
-                            <i class="fas fa-edit"></i> Editar
-                        </button>
-                        <button class="btn btn-danger btn-sm" style="margin-left: 10px;">
-                            <i class="fas fa-trash"></i> Eliminar
-                        </button>
-                    </div>
+                    <?php 
+                $sql = "SELECT * FROM noticia ORDER BY fecha_publicacion DESC";
+                $result = mysqli_query($conexion, $sql);
+                $noticias = mysqli_fetch_all($result, MYSQLI_ASSOC);
+                foreach ($noticias as $noticia): ?>
+                <div class="noticia">
+                    <h3><?php echo htmlspecialchars($noticia['titulo']); ?></h3>
+                    <small>Publicado el: <?php echo htmlspecialchars(date('d/m/Y H:i', strtotime($noticia['fecha_publicacion']))); ?> por <?php echo htmlspecialchars($noticia['autor']); ?> <?php if($noticia['destacada']) echo "<strong>(Destacada)</strong>"; ?></small>
+                    <?php if (!empty($noticia['imagen_url'])): ?>
+                        <img src="<?php echo htmlspecialchars($noticia['imagen_url']); ?>" alt="<?php echo htmlspecialchars($noticia['titulo']); ?>" class="imagen-noticia">
+                    <?php endif; ?>
+                    <p><?php echo nl2br(htmlspecialchars($noticia['contenido'])); ?></p>
+                </div>
+                <?php endforeach; ?>
                 </div>
             </div>
         </div>
@@ -494,7 +499,10 @@
             <div class="header">
                 <h1>Gestión de Noticias</h1>
                 <button class="btn btn-primary" onclick="mostrarNuevaNoticia()">
-                    <i class="fas fa-plus"></i> Nueva Noticia
+                    <a href="crear_noticia.php">
+                        <i class="fas fa-plus"></i> Nueva Noticia
+                    </a>
+                
                 </button>
             </div>
 
@@ -502,103 +510,22 @@
                 <div class="content-title">
                     Todas las Noticias
                 </div>
-                
-                <div class="noticia-card">
-                    <div class="noticia-title">Nuevas Técnicas de Cultivo</div>
-                    <div class="noticia-date">Publicado el 12/06/2023</div>
-                    <div class="noticia-content">
-                        <p>Hemos implementado nuevas técnicas de cultivo que aumentan el rendimiento en un 20%...</p>
-                    </div>
-                    <div style="margin-top: 15px;">
-                        <button class="btn btn-outline btn-sm">
-                            <i class="fas fa-edit"></i> Editar
-                        </button>
-                        <button class="btn btn-danger btn-sm" style="margin-left: 10px;">
-                            <i class="fas fa-trash"></i> Eliminar
-                        </button>
-                    </div>
+                <h2>Noticias Existentes</h2>
+                <?php 
+                $sql = "SELECT * FROM noticia ORDER BY fecha_publicacion DESC";
+                $result = mysqli_query($conexion, $sql);
+                $noticias = mysqli_fetch_all($result, MYSQLI_ASSOC);
+                foreach ($noticias as $noticia): ?>
+                <div class="noticia">
+                    <h3><?php echo htmlspecialchars($noticia['titulo']); ?></h3>
+                    <small>Publicado el: <?php echo htmlspecialchars(date('d/m/Y H:i', strtotime($noticia['fecha_publicacion']))); ?> por <?php echo htmlspecialchars($noticia['autor']); ?> <?php if($noticia['destacada']) echo "<strong>(Destacada)</strong>"; ?></small>
+                    <?php if (!empty($noticia['imagen_url'])): ?>
+                        <img src="<?php echo htmlspecialchars($noticia['imagen_url']); ?>" alt="<?php echo htmlspecialchars($noticia['titulo']); ?>" class="imagen-noticia">
+                    <?php endif; ?>
+                    <p><?php echo nl2br(htmlspecialchars($noticia['contenido'])); ?></p>
                 </div>
-                
-                <div class="noticia-card">
-                    <div class="noticia-title">Taller de Podas</div>
-                    <div class="noticia-date">Publicado el 05/06/2023</div>
-                    <div class="noticia-content">
-                        <p>Este sábado realizaremos un taller gratuito sobre técnicas de poda para rosales...</p>
-                    </div>
-                    <div style="margin-top: 15px;">
-                        <button class="btn btn-outline btn-sm">
-                            <i class="fas fa-edit"></i> Editar
-                        </button>
-                        <button class="btn btn-danger btn-sm" style="margin-left: 10px;">
-                            <i class="fas fa-trash"></i> Eliminar
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="noticia-card">
-                    <div class="noticia-title">Nueva Variedad de Rosas</div>
-                    <div class="noticia-date">Publicado el 28/05/2023</div>
-                    <div class="noticia-content">
-                        <p>Presentamos nuestra nueva variedad de rosas resistentes a plagas, disponible a partir de...</p>
-                    </div>
-                    <div style="margin-top: 15px;">
-                        <button class="btn btn-outline btn-sm">
-                            <i class="fas fa-edit"></i> Editar
-                        </button>
-                        <button class="btn btn-danger btn-sm" style="margin-left: 10px;">
-                            <i class="fas fa-trash"></i> Eliminar
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="content-box" id="nueva-noticia" style="display: none;">
-                <div class="content-title">
-                    Nueva Noticia
-                    <button class="btn btn-outline btn-sm" onclick="mostrarListaNoticia()"></button>
-                                </div>
-
-            <div class="content-box" id="form-noticia" style="display: none;">
-                <div class="content-title">
-                    <span id="form-noticia-title">Nueva Noticia</span>
-                    <button class="btn btn-outline btn-sm" onclick="mostrarListaNoticias()">
-                        <i class="fas fa-arrow-left"></i> Volver
-                    </button>
-                </div>
-                
-                <div class="form-group">
-                    <label for="noticia-titulo" class="form-label">Título</label>
-                    <input type="text" id="noticia-titulo" class="form-control" placeholder="Ingrese el título de la noticia">
-                </div>
-                
-                <div class="form-group">
-                    <label for="noticia-imagen" class="form-label">Imagen Destacada</label>
-                    <div class="photo-preview">
-                        <input type="file" id="noticia-imagen" class="photo-upload" accept="image/*">
-                        <div class="photo-info">
-                            <i class="fas fa-cloud-upload-alt"></i>
-                            <div>Haz clic para seleccionar una imagen</div>
-                            <div style="font-size: 14px; margin-top: 10px;">Tamaño recomendado: 1200x600 px (Max. 300KB)</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="noticia-contenido" class="form-label">Contenido</label>
-                    <textarea id="noticia-contenido" class="form-control" rows="10" placeholder="Escriba el contenido de la noticia"></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="noticia-fecha" class="form-label">Fecha de Publicación</label>
-                    <input type="date" id="noticia-fecha" class="form-control">
-                </div>
-                
-                <div style="display: flex; justify-content: flex-end;">
-                    <button class="btn btn-primary" id="btn-guardar-noticia">
-                        <i class="fas fa-save"></i> Guardar Noticia
-                    </button>
-                </div>
-            </div>
+                <?php endforeach; ?>
+            </div>    
         </div>
 
         <!-- Consultas Tab -->
@@ -631,59 +558,46 @@
                         </tr>
                     </thead>
                     <tbody id="consultas-body">
-                        <tr>
-                            <td>María González</td>
-                            <td>maria@gmail.com</td>
-                            <td>+54 11 1234-5678</td>
-                            <td>Cultivo de rosas</td>
-                            <td>15/06/2023</td>
-                            <td><span class="status unread">No leída</span></td>
-                            <td>
-                                <button class="btn btn-outline btn-sm" onclick="verConsulta(1)">
-                                    <i class="fas fa-eye"></i> Ver
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Carlos Martínez</td>
-                            <td>carlos@hotmail.com</td>
-                            <td>+54 11 2345-6789</td>
-                            <td>Podas</td>
-                            <td>14/06/2023</td>
-                            <td><span class="status read">Leída</span></td>
-                            <td>
-                                <button class="btn btn-outline btn-sm" onclick="verConsulta(2)">
-                                    <i class="fas fa-eye"></i> Ver
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Laura Sánchez</td>
-                            <td>laura@gmail.com</td>
-                            <td>+54 11 3456-7890</td>
-                            <td>Control de plagas</td>
-                            <td>13/06/2023</td>
-                            <td><span class="status read">Leída</span></td>
-                            <td>
-                                <button class="btn btn-outline btn-sm" onclick="verConsulta(3)">
-                                    <i class="fas fa-eye"></i> Ver
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Juan Pérez</td>
-                            <td>juan@yahoo.com</td>
-                            <td>+54 11 4567-8901</td>
-                            <td>Fertilizantes</td>
-                            <td>12/06/2023</td>
-                            <td><span class="status unread">No leída</span></td>
-                            <td>
-                                <button class="btn btn-outline btn-sm" onclick="verConsulta(4)">
-                                    <i class="fas fa-eye"></i> Ver
-                                </button>
-                            </td>
-                        </tr>
-                    </tbody>
+        <?php
+
+        $sql = "SELECT * FROM mensaje ORDER BY fecha_creacion DESC";
+        $result = mysqli_query($conexion, $sql);
+
+        if ($result && mysqli_num_rows($result) > 0) {
+            while ($row = mysqli_fetch_assoc($result)) {
+                    // Formatear fecha a dd/mm/yyyy
+            $fecha = date('d/m/Y', strtotime($row['fecha_creacion']));
+
+            // Estado leído o no leído
+            $statusClass = ($row['leido']) ? 'read' : 'unread';
+            $statusText = ($row['leido']) ? 'Leída' : 'No leída';
+
+            // Escapar datos para evitar XSS
+            $id = (int)$row['id'];
+            $nombre = htmlspecialchars($row['nombre']);
+            $email = htmlspecialchars($row['email']);
+            $telefono = htmlspecialchars($row['telefono']);
+            $interes = htmlspecialchars($row['interes']);
+
+            echo "<tr>
+                <td>{$nombre}</td>
+                <td>{$email}</td>
+                <td>{$telefono}</td>
+                <td>{$interes}</td>
+                <td>{$fecha}</td>
+                <td><span class='status {$statusClass}'>{$statusText}</span></td>
+                <td>
+                    <button class='btn btn-outline btn-sm' onclick='verConsulta({$id})'>
+                        <i class='fas fa-eye'></i> Ver
+                    </button>
+                </td>
+              </tr>";
+            }
+        } else {
+            echo "<tr><td colspan='7'>No hay consultas para mostrar.</td></tr>";
+        }
+        ?>
+        </tbody>
                 </table>
             </div>
         </div>

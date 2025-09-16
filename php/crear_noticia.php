@@ -2,17 +2,58 @@
 session_start();
 include('conexion.php');
 
+$autor = isset($_SESSION['nombreusuario']) ? mysqli_real_escape_string($conexion, $_SESSION['nombreusuario']) : 'Anónimo';
+
 // Procesar formulario para agregar noticias
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['agregar_noticia'])) {
     $titulo = mysqli_real_escape_string($conexion, $_POST['titulo']);
     $contenido = mysqli_real_escape_string($conexion, $_POST['contenido']);
-    
-    $query = "INSERT INTO noticias (titulo, contenido) VALUES ('$titulo', '$contenido')";
-    
-    if (mysqli_query($conexion, $query)) {
-        // Mensaje de éxito si quieres
+    $destacada = isset($_POST['destacada']) ? 1 : 0;
+    $fecha_publicacion = date('Y-m-d H:i:s');
+
+    // Procesar imagen
+    if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
+        $imagen = $_FILES['imagen']['name'];
+        $ruta_temp = $_FILES['imagen']['tmp_name'];
+        $destino = "img/"; // Carpeta relativa para guardar imágenes
+
+        // Crear carpeta si no existe
+        if (!is_dir($destino)) {
+            mkdir($destino, 0755, true);
+        }
+
+        // Generar nombre único para evitar sobreescritura
+        $ext = pathinfo($imagen, PATHINFO_EXTENSION);
+        $nombre_imagen = uniqid('img_') . '.' . $ext;
+        $ruta_imagen = $destino . $nombre_imagen;
+
+        // Validar formato
+        $formatos_validos = array("jpg", "jpeg", "png", "gif");
+        if (in_array(strtolower($ext), $formatos_validos)) {
+            if (move_uploaded_file($ruta_temp, $ruta_imagen)) {
+                // Insertar noticia con imagen
+                $query = "INSERT INTO noticia (titulo, contenido, imagen_url, fecha_publicacion, autor, destacada) 
+                          VALUES ('$titulo', '$contenido', '$ruta_imagen', '$fecha_publicacion', '$autor', $destacada)";
+                if (mysqli_query($conexion, $query)) {
+                    $mensaje = "Noticia agregada con éxito.";
+                } else {
+                    $error = "Error al agregar noticia: " . mysqli_error($conexion);
+                }
+            } else {
+                $error = "Error al subir la imagen.";
+            }
+        } else {
+            $error = "Formato de imagen no válido. Solo se permiten JPG, JPEG, PNG o GIF.";
+        }
     } else {
-        echo "Error: " . mysqli_error($conexion);
+        // Insertar noticia sin imagen
+        $query = "INSERT INTO noticia (titulo, contenido, fecha_publicacion, autor, destacada) 
+                  VALUES ('$titulo', '$contenido', '$fecha_publicacion', '$autor', $destacada)";
+        if (mysqli_query($conexion, $query)) {
+            $mensaje = "Noticia agregada con éxito.";
+        } else {
+            $error = "Error al agregar noticia: " . mysqli_error($conexion);
+        }
     }
 }
 
@@ -96,12 +137,24 @@ $noticias = mysqli_fetch_all($result, MYSQLI_ASSOC);
 <body>
     <div class="container">
         <h1>Panel de Administración</h1>
+
+        <?php if (isset($mensaje)): ?>
+            <div class="mensaje exito"><?php echo htmlspecialchars($mensaje); ?></div>
+        <?php endif; ?>
+        <?php if (isset($error)): ?>
+            <div class="mensaje error"><?php echo htmlspecialchars($error); ?></div>
+        <?php endif; ?>
         
         <div class="form-noticia">
             <h2>Agregar Nueva Noticia</h2>
-            <form method="post">
+            <form method="post" enctype="multipart/form-data">
                 <input type="text" name="titulo" placeholder="Título de la noticia" required>
                 <textarea name="contenido" placeholder="Contenido completo de la noticia..." required></textarea>
+                <label for="imagen">Imagen (opcional):</label>
+                <input type="file" name="imagen" accept="image/*">
+                <label class="checkbox-label">
+                    <input type="checkbox" name="destacada" value="1"> Marcar como destacada
+                </label>
                 <button type="submit" name="agregar_noticia">Publicar Noticia</button>
             </form>
         </div>
@@ -110,7 +163,10 @@ $noticias = mysqli_fetch_all($result, MYSQLI_ASSOC);
         <?php foreach ($noticias as $noticia): ?>
         <div class="noticia">
             <h3><?php echo htmlspecialchars($noticia['titulo']); ?></h3>
-            <small>Publicado el: <?php echo htmlspecialchars($noticia['fecha_publicacion']); ?></small>
+            <small>Publicado el: <?php echo htmlspecialchars(date('d/m/Y H:i', strtotime($noticia['fecha_publicacion']))); ?> por <?php echo htmlspecialchars($noticia['autor']); ?> <?php if($noticia['destacada']) echo "<strong>(Destacada)</strong>"; ?></small>
+            <?php if (!empty($noticia['imagen_url'])): ?>
+                <img src="<?php echo htmlspecialchars($noticia['imagen_url']); ?>" alt="<?php echo htmlspecialchars($noticia['titulo']); ?>" class="imagen-noticia">
+            <?php endif; ?>
             <p><?php echo nl2br(htmlspecialchars($noticia['contenido'])); ?></p>
         </div>
         <?php endforeach; ?>
