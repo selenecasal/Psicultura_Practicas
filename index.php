@@ -32,21 +32,6 @@ body {
   min-height: 100vh;
 }
 
-header{
-  display:flex;
-  flex-direction: row;
-   /* position: fixed; altavergamalhecha*/ 
-  
-}
-.titulo{  
-  margin-top:3vh;
-  width: 70%;
-}
-
-.titulo h1{
-
-}
-
 header.header-violeta {
   width: 100%;
   background: linear-gradient(135deg, #670066 0%, #950095 100%);
@@ -63,7 +48,6 @@ header.header-violeta h1 {
   letter-spacing: 1.2px;
   text-shadow: 0 2px 6px rgba(0,0,0,0.3);
   margin: 0;
-  
 }
 
 header.header-violeta p {
@@ -196,7 +180,7 @@ footer.footer-violeta p {
 
 .img-1200x600 {
   width: 100%;
-  height: 350px;
+  height: 300px;
   object-fit: cover;
   border-radius: 12px;
   box-shadow: 0 6px 15px rgb(0 0 0 / 0.1);
@@ -220,10 +204,6 @@ footer.footer-violeta p {
   margin: 40px 0;
   border-radius: 4px;
 }
-.header-violeta img{
-  width: 20%;
-  filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(32deg) brightness(102%) contrast(108%);
-}
 
 </style>
 </head>
@@ -231,11 +211,8 @@ footer.footer-violeta p {
 
 <!-- Header fijo -->
 <header class="header-violeta container mx-auto">
-  <img src="img/logo_neco.svg" alt="">
-  <div class="titulo">
   <h1>Estación de Piscicultura de Necochea</h1>
   <p>Preservación y desarrollo de especies acuáticas locales</p>
-  </div>
 </header>
 
 <!-- Contenido principal -->
@@ -256,21 +233,21 @@ footer.footer-violeta p {
     <h2>Especies y Trabajo Técnico</h2>
     <div class="grid md:grid-cols-3 gap-8 mt-4">
       <article class="species-card" tabindex="0" aria-label="Pejerrey">
-        <img src="img/pejerrey.jpeg" alt="Pejerrey" class="w-full h-[300px] object-cover" />
+        <img src="img/pejerrey.png" alt="Pejerrey" class="w-full h-[300px] object-cover" />
         <div class="p-6 flex flex-col">
           <h3>Pejerrey</h3>
           <p>Reproducción natural desde septiembre, extracción diaria de ovas y crianza en copas de incubación.</p>
         </div>
       </article>
       <article class="species-card" tabindex="0" aria-label="Bagre Sapo">
-        <img src="img/bagre.jpg" alt="Bagre Sapo" class="w-full h-[300px] object-cover" />
+        <img src="https://source.unsplash.com/1200x600/?catfish" alt="Bagre Sapo" class="w-full h-[300px] object-cover" />
         <div class="p-6 flex flex-col">
           <h3>Bagre Sapo</h3>
           <p>Cría y manejo en estanques controlando agua, alimentación y salud de la especie.</p>
         </div>
       </article>
       <article class="species-card" tabindex="0" aria-label="Especies Ornamentales">
-        <img src="img/pescao.jpeg" alt="Especies Ornamentales" class="w-full h-[300px] object-cover" />
+        <img src="https://source.unsplash.com/1200x600/?tropicalfish" alt="Especies Ornamentales" class="w-full h-[300px] object-cover" />
         <div class="p-6 flex flex-col">
           <h3>Especies Ornamentales</h3>
           <p>Mojarras, carassius, axolotes, corydoras, morenita madrecita, bagre cantor, anguila, ranas, camarones, chanchitas, caracoles manzana y peces tropicales.</p>
@@ -282,7 +259,7 @@ footer.footer-violeta p {
   <!-- Procesos -->
   <section id="procesos" class="contenedor fade-in" tabindex="0" aria-label="Procesos y Áreas Específicas">
     <h2>Procesos y Áreas Específicas</h2>
-    <img src="img/acuaponico.jpg" alt="Acuaponía" class="img-1200x600" />
+    <img src="https://source.unsplash.com/1200x600/?aquaponics" alt="Acuaponía" class="img-1200x600" />
     <p><strong>Acuaponía:</strong> Agua circula desde una pileta con especies nativas a filtros y luego alimenta plantas en film nutritivo, balsa flotante y sustrato fijo. Las raíces absorben nutrientes y el agua vuelve purificada.</p>
     <p><strong>Fitoremediación:</strong> Agua de los estanques pasa por plantas sumergidas, palustres o flotantes que absorben amonio, amoníaco, nitritos y nitratos. Se aplica en reproductores de pejerrey.</p>
     <p><strong>Circuito de agua:</strong> Estanques de cemento con circulación abierta; calidad del agua controlada anualmente mediante análisis del pozo y vigilancia de enfermedades.</p>
@@ -291,7 +268,7 @@ footer.footer-violeta p {
   <!-- Educación Ambiental -->
   <section id="educacion" class="contenedor fade-in" tabindex="0" aria-label="Educación Ambiental">
     <h2>Educación Ambiental</h2>
-    <img src="img/WhatsApp Image 2025-10-07 at 11.38.44.jpeg" alt="Educación Ambiental" class="img-1200x600" />
+    <img src="https://source.unsplash.com/1200x600/?environment,education" alt="Educación Ambiental" class="img-1200x600" />
     <p>Se concientiza sobre el cuidado del recurso natural y las especies. Charlas educativas para todos los niveles, vinculadas con acuaponía y fitoremediación.</p>
     <p>Impacto positivo: repoblación de ambientes naturales con especies sometidas a presión de pesca.</p>
   </section>
@@ -299,7 +276,7 @@ footer.footer-violeta p {
   <!-- Visitas -->
   <section id="visitas" class="contenedor fade-in" tabindex="0" aria-label="Visitas Guiadas y Comunidad">
     <h2>Visitas Guiadas y Comunidad</h2>
-    <img src="img/pisicultura.jpeg" alt="Visitas Guiadas" class="img-1200x600" />
+    <img src="https://source.unsplash.com/1200x600/?tourism,nature" alt="Visitas Guiadas" class="img-1200x600" />
     <p>Se reciben escuelas, turistas, investigadores y público general. Las visitas incluyen recorrido sectorizado, explicación de especies y curiosidades.</p>
     <p>Mensaje principal: <strong>El Río Quequén es un recurso agotable; la Estación contribuye a preservar especies emblemáticas como el pejerrey.</strong></p>
   </section>
@@ -309,7 +286,7 @@ footer.footer-violeta p {
   <!-- Futuro -->
   <section id="futuro" class="contenedor fade-in" tabindex="0" aria-label="Perspectiva Personal y Futuro">
     <h2>Perspectiva Personal y Futuro</h2>
-    <img src="img/carapa.jpeg" alt="Futuro" class="img-1200x600" />
+    <img src="https://source.unsplash.com/1200x600/?future,technology" alt="Futuro" class="img-1200x600" />
     <p>Trabajar en la Estación permite aplicar conocimientos diariamente y enseñar sobre conservación a nuevas generaciones.</p>
     <p>Desafíos: cortes eléctricos, insumos y cuidado de animales.</p>
     <p>Proyectos: ampliar sistemas de recirculación con energías amigables, cría en jaulas flotantes, nuevos biodigestores, charlas didácticas y reactivación de convenios con universidades y clubes de pesca.</p>
